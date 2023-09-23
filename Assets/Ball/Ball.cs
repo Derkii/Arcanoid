@@ -1,5 +1,7 @@
-﻿using Pause;
+﻿using System;
+using Pause;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Game
 {
@@ -62,15 +64,12 @@ namespace Game
             _direction = (Vector3.Reflect(_direction, collision.GetContact(0).normal) +
                           randomVector3
                 ).normalized;
-
-            Debug.Log(_direction.y);
-            Debug.Log(randomVector3.y);
         }
 
         private Vector3 RandomVector3(Frame xFrame, Frame yFrame, Frame zFrame)
         {
             float Range(Frame frame) =>
-                    Random.Range(frame.Min, frame.Max);
+                Random.Range(frame.Min, frame.Max);
 
 
             var x = Range(xFrame);
