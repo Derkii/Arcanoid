@@ -8,7 +8,7 @@ namespace Game
     [RequireComponent(typeof(Movement))]
     public class Ball : MonoBehaviour, IInput, IPausable
     {
-        [SerializeField] private float _startSpeed, _additionalSpeed, _maxSpeed;
+        [SerializeField] private float _startSpeed, _additionalSpeed, _maxSpeed, _rotationMultiplier = 4f;
 
         private Movement _movement;
         private Vector3 _direction;
@@ -56,7 +56,7 @@ namespace Game
         private void OnCollisionEnter(Collision collision)
         {
             if (_isPlayerControlling) return;
-            var frame = new Frame(-0.1f, 0.1f);
+            var frame = new Frame(-0.1f, 0.15f);
             var randomVector3 = RandomVector3(
                 frame,
                 frame,
@@ -75,12 +75,13 @@ namespace Game
             var x = Range(xFrame);
             var y = Range(yFrame);
             var z = Range(zFrame);
-            return new Vector3(x, y, z);
+           return new Vector3(x, y, z);
         }
 
         private void Update()
         {
             if (_isPlayerControlling || _paused) return;
+            transform.eulerAngles += new Vector3(0f, _direction.z, _direction.x).normalized * _movement.Speed * _rotationMultiplier * Time.deltaTime;
             _movement.Move();
         }
 
@@ -91,13 +92,15 @@ namespace Game
                 _rigidBody.constraints |= RigidbodyConstraints.FreezePosition;
                 transform.parent = playerTransform;
                 transform.localPosition = new Vector3(0f, 0f, 1f);
+                _direction = Vector3.zero;
+                transform.eulerAngles = Vector3.zero;
             }
             else
             {
                 if (!_isPlayerControlling) return;
                 _rigidBody.constraints ^= RigidbodyConstraints.FreezePosition;
-                _direction = playerTransform.forward;
                 transform.parent = null;
+                _direction = playerTransform.forward;
             }
 
             _isPlayerControlling = state;
